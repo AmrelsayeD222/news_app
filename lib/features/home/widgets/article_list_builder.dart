@@ -8,8 +8,9 @@ import 'article_widget.dart';
 class ArticleListBuilder extends StatefulWidget {
   const ArticleListBuilder({
     super.key,
+    required this.category,
   });
-
+  final String category;
   @override
   State<ArticleListBuilder> createState() => _ArticleListBuilderState();
 }
@@ -25,7 +26,7 @@ class _ArticleListBuilderState extends State<ArticleListBuilder> {
 
   Future<List<Article>> fetchArticles() async {
     final result =
-        await NewsRepoImpl(NewsService()).fetchNews(category: 'general');
+        await NewsRepoImpl(NewsService()).fetchNews(category: widget.category);
 
     return result.fold(
       (failure) => throw Exception(failure.errMessage),

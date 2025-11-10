@@ -4,25 +4,28 @@ import 'article_list_builder.dart';
 import 'categories_list_builder.dart';
 
 class HomeViewBody extends StatelessWidget {
-  const HomeViewBody({super.key});
+  const HomeViewBody({super.key, required this.category});
+  final String category;
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(8.0),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: CustomScrollView(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: CategoriesListBuilder(),
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: SizedBox(
               height: 8,
             ),
           ),
           SliverToBoxAdapter(
-            child: ArticleListBuilder(),
+            child: ArticleListBuilder(
+              category: category,
+            ),
           ),
         ],
       ),

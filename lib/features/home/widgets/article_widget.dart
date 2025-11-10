@@ -10,15 +10,15 @@ class ArticleWidget extends StatelessWidget {
     return Column(
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(6),
-          child: Image.network(
-            article.urlToImage ??
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReJ-KJe8UQN3HaEhwM6vLiXodYapsJqdSEaA&s',
-            height: 200,
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-        ),
+            borderRadius: BorderRadius.circular(6),
+            child: article.urlToImage != null && article.urlToImage!.isNotEmpty
+                ? Image.network(
+                    article.urlToImage!,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  )
+                : const SizedBox.shrink()),
         const SizedBox(height: 5),
         Text(
           article.title ?? '',
