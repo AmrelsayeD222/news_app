@@ -8,11 +8,8 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: false,
       appBar: AppBar(
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
         title: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [

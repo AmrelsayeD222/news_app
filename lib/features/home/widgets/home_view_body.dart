@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'article_list_builder.dart';
 import 'categories_list_builder.dart';
 
 class HomeViewBody extends StatelessWidget {
@@ -19,6 +20,9 @@ class HomeViewBody extends StatelessWidget {
             child: SizedBox(
               height: 8,
             ),
+          ),
+          SliverToBoxAdapter(
+            child: ArticleListBuilder(),
           ),
         ],
       ),
