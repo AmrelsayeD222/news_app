@@ -11,10 +11,12 @@ class SelectedCategoryView extends StatelessWidget {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: ArticleListBuilder(
-            category: category,
-          ),
+        child: CustomScrollView(
+          slivers: [
+            ArticleListBuilder(
+              category: category,
+            ),
+          ],
         ),
       ),
     );

@@ -8,26 +8,26 @@ class ArticleWidget extends StatelessWidget {
   final Article article;
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () {
-            if ((article.url?.isNotEmpty ?? false)) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ArticleDetalisView(url: article.url!),
-                ),
-              );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('No URL available for this article.'),
-                ),
-              );
-            }
-          },
-          child: ClipRRect(
+    return GestureDetector(
+      onTap: () {
+        if ((article.url?.isNotEmpty ?? false)) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ArticleDetalisView(url: article.url!),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No URL available for this article.'),
+            ),
+          );
+        }
+      },
+      child: Column(
+        children: [
+          ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child:
                   article.urlToImage != null && article.urlToImage!.isNotEmpty
@@ -38,27 +38,27 @@ class ArticleWidget extends StatelessWidget {
                           fit: BoxFit.cover,
                         )
                       : const SizedBox.shrink()),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          article.title ?? '',
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Colors.black87,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
+          const SizedBox(height: 5),
+          Text(
+            article.title ?? '',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          article.description ?? '',
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(color: Colors.grey, fontSize: 14),
-        ),
-        const SizedBox(height: 15),
-      ],
+          const SizedBox(height: 2),
+          Text(
+            article.description ?? '',
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+          const SizedBox(height: 15),
+        ],
+      ),
     );
   }
 }

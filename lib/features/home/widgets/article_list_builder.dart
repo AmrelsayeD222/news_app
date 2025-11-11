@@ -40,19 +40,29 @@ class _ArticleListBuilderState extends State<ArticleListBuilder> {
       future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+          return SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(child: Text('Error: ${snapshot.error}')),
+          );
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No articles found.'));
+          return const SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(child: Text('No articles found.')),
+          );
         } else {
           final articles = snapshot.data!;
-          return ListView.builder(
-            physics: const BouncingScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: articles.length,
-            itemBuilder: (context, index) =>
-                ArticleWidget(article: articles[index]),
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => ArticleWidget(article: articles[index]),
+              childCount: articles.length,
+            ),
           );
         }
       },
