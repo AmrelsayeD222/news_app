@@ -12,79 +12,108 @@ class ServerFailure extends Failure {
   factory ServerFailure.fromDioError(DioException dioError) {
     switch (dioError.type) {
       case DioExceptionType.connectionTimeout:
-        return const ServerFailure('Connection timeout with API server');
+        return const ServerFailure(
+            'Connection timeout. Please check your internet and try again');
 
       case DioExceptionType.sendTimeout:
-        return const ServerFailure('Send timeout with API server');
+        return const ServerFailure('Request timeout. Please try again');
 
       case DioExceptionType.receiveTimeout:
-        return const ServerFailure('Receive timeout with API server');
+        return const ServerFailure('Server response timeout. Please try again');
 
       case DioExceptionType.badCertificate:
-        return const ServerFailure('Bad certificate from API server');
+        return const ServerFailure('Security certificate error');
 
       case DioExceptionType.cancel:
-        return const ServerFailure('Request to API server was cancelled');
+        return const ServerFailure('Request cancelled');
 
       case DioExceptionType.badResponse:
-        return ServerFailure.fromResponse(
-            dioError.response?.statusCode, dioError.response?.data);
+        return ServerFailure._fromResponse(dioError.response);
 
       case DioExceptionType.connectionError:
-        // Check for specific socket errors
         if (dioError.error is SocketException) {
           final socketError = dioError.error as SocketException;
           if (socketError.osError?.errorCode == 104 ||
               socketError.message.contains('Connection reset')) {
             return const ServerFailure(
-                'Connection was reset by server. Please try again');
+                'Connection lost. Please check your internet and try again');
           }
           if (socketError.osError?.errorCode == 111) {
-            return const ServerFailure('Server is unreachable');
+            return const ServerFailure(
+                'Cannot reach server. Please try again later');
           }
         }
-        return const ServerFailure('No Internet connection');
+        return const ServerFailure('No internet connection');
 
       case DioExceptionType.unknown:
       default:
-        // Handle SocketException in unknown type as well
         if (dioError.error is SocketException) {
           final socketError = dioError.error as SocketException;
           if (socketError.osError?.errorCode == 104 ||
               socketError.message.contains('Connection reset')) {
-            return const ServerFailure(
-                'Connection was reset by server. Please try again');
+            return const ServerFailure('Connection lost. Please try again');
           }
         }
         if (dioError.message?.contains('Connection reset') ?? false) {
-          return const ServerFailure(
-              'Connection was reset by server. Please try again');
+          return const ServerFailure('Connection lost. Please try again');
         }
-        return const ServerFailure('Unexpected error, please try again later');
+        return const ServerFailure('Something went wrong. Please try again');
     }
   }
 
-  factory ServerFailure.fromResponse(int? statusCode, dynamic response) {
-    if (statusCode == null) return const ServerFailure('Unknown error');
-    switch (statusCode) {
-      case 400:
-        return const ServerFailure('Bad request, please try again');
-      case 401:
-        return const ServerFailure('Unauthorized access');
-      case 403:
-        return const ServerFailure('Forbidden request');
-      case 404:
-        return const ServerFailure('Resource not found');
-      case 500:
-        return const ServerFailure('Internal server error');
-      case 502:
-        return const ServerFailure('Bad gateway');
-      case 503:
-        return const ServerFailure('Service unavailable');
-      case 504:
-        return const ServerFailure('Gateway timeout');
-      default:
-        return ServerFailure('Error $statusCode: ${response.toString()}');
+  // Helper method لمعالجة bad response
+  static ServerFailure _fromResponse(Response? response) {
+    if (response == null) {
+      return const ServerFailure('No response from server');
     }
+
+    final statusCode = response.statusCode;
+    final responseData = response.data;
+
+    // محاولة استخراج رسالة الخطأ من الـ response
+    String message = 'Error occurred';
+
+    if (responseData is Map<String, dynamic>) {
+      message = responseData['message']?.toString() ??
+          responseData['error']?.toString() ??
+          'Received invalid status code: $statusCode';
+    } else if (responseData is String && responseData.isNotEmpty) {
+      message = responseData;
+    } else {
+      // رسائل افتراضية حسب status code
+      switch (statusCode) {
+        case 400:
+          message = 'Bad request';
+          break;
+        case 401:
+          message = 'Unauthorized access';
+          break;
+        case 403:
+          message = 'Access forbidden';
+          break;
+        case 404:
+          message = 'Resource not found';
+          break;
+        case 429:
+          message = 'Too many requests. Please try again later';
+          break;
+        case 500:
+          message = 'Internal server error';
+          break;
+        case 502:
+          message = 'Bad gateway';
+          break;
+        case 503:
+          message = 'Service unavailable';
+          break;
+        case 504:
+          message = 'Gateway timeout';
+          break;
+        default:
+          message = 'Error $statusCode occurred';
+      }
+    }
+
+    return ServerFailure(message);
   }
 }
